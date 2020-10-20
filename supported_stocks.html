@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Acie</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+  <div class="menu">
+    Akcie
+      <a href="company_news.html">news</a>
+      <a href="supported_stocks.html">stocks</a>
+      <a class="right" href="login.html">Login</a>
+      <span class="icon right"><i class="fa fa-bars"></i>
+        <span>
+          <a href="login.html">Login</a>
+          <a href="company_news.html">news</a>
+          <a href="supported_stocks.html">stocks</a>
+        </span>
+      </span>
+  </div>
+  <ul id=zoznam></ul>
+
+
+    <script>
+      let zoznam = document.getElementById("zoznam");
+        const getRes = (s) => {
+            
+         return new Promise((a,b)=>{
+            var xx = new XMLHttpRequest();
+            xx.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                let i = JSON.parse(this.responseText);
+                   a(i)
+                   return;
+                }
+                if (this.readyState == 4 && this.status != 200){
+                  b("Error")
+                }
+            };
+            xx.open("GET", "https://finnhub.io/api/v1/stock/profile2?symbol=" + s + "&token=bu6lbcn48v6pfj0ol470", true);
+            xx.send();
+
+         });
+        } 
+
+        const getCompany = c =>{
+            let li = document.createElement("li")
+            let a = document.createElement("a")
+            let h3 = document.createElement("h3")
+            let p = document.createElement("p")
+            let p2 = document.createElement("p")
+            let p3 = document.createElement("p")
+            let p4 = document.createElement("p")
+            let p5 = document.createElement("p")
+            let logo = document.createElement("img")
+            logo.setAttribute("class", "logo")
+            logo.src = c.logo
+            a.href = c.weburl;
+            
+            c.country && p2.appendChild(document.createTextNode("country: " +c.country))
+            c.currency && p3.appendChild(document.createTextNode("currency: " + c.currency))
+            c.exchange && p.appendChild(document.createTextNode("exchange: " +c.exchange))
+            c.marketCapitalization && p4.appendChild(document.createTextNode("market capitalization: " + c.marketCapitalization))
+            c.phone && p5.appendChild(document.createTextNode("phone: " +c.phone))
+            c.name && h3.appendChild(document.createTextNode(c.name))
+            c.weburl && a.appendChild(document.createTextNode("GO TO"))
+            li.setAttribute("class", "card")
+            li.appendChild(h3)
+            li.appendChild(p)
+            li.appendChild(p2)
+            li.appendChild(p3)
+            li.appendChild(p4)
+            li.appendChild(p5)
+            li.appendChild(logo)
+            li.appendChild(a)
+            
+            return li;
+        }
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          let symbols = JSON.parse(this.responseText);
+            let res = symbols.slice(0,10).map(a=>getRes(a.symbol));
+            //console.log(symbols.map((a,i)=>a.symbol == "CCEP" && console.log(i)))
+            Promise.allSettled(res).then(a=>{
+                a.forEach(b=>b.value.name && zoznam.appendChild(getCompany(b.value)));
+            })
+        }
+      };
+      xhttp.open("GET", "https://finnhub.io/api/v1/stock/symbol?exchange=US&token=bu6lbcn48v6pfj0ol470", true);
+      xhttp.send();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Page Title</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+  
+  <div class="menu">
+    Akcie
+      <a href="company_news.html">news</a>
+      <a href="supported_stocks.html">stocks</a>
+      <a class="right" href="login.html">Login</a>
+      <span class="icon right"><i class="fa fa-bars"></i>
+        <span>
+          <a href="login.html">Login</a>
+          <a href="company_news.html">news</a>
+          <a href="supported_stocks.html">stocks</a>
+        </span>
+      </span>
+  </div>
+  
+  <ul id=zoznam></ul>
+
+    <script>
+      let zoznam = document.getElementById("zoznam");
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          let data = JSON.parse(this.responseText);
+          console.log(data);
+          data.forEach(element => {
+            let li = document.createElement("Li");
+            li.setAttribute("class", "card")
+            let h3 = document.createElement("h3");
+            let a = document.createElement("a");
+            let img = document.createElement("img");
+            img.src = element.image;
+            a.href = element.url;
+            h3.appendChild(document.createTextNode(element.headline));
+            li.appendChild(h3);
+            a.appendChild(img); 
+            li.appendChild(a);
+            zoznam.appendChild(li);
+          });
+        }
+      };
+      xhttp.open("GET", "https://finnhub.io/api/v1/company-news?symbol=AAPL&from=2020-04-30&to=2020-05-01&token=bu6lbcn48v6pfj0ol470", true);
+      xhttp.send();
+    </script>
+</body>
+
+</html>
